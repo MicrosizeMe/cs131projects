@@ -1,0 +1,63 @@
+Server requirements
+
+Servers: 'Alford', 'Ball', 'Hamilton', 'Holiday', 'Welsh'
+
+Alford->Hamilton
+Alford->Welsh
+Ball->Holiday
+Ball->Welsh
+Hamilton->Holiday
+Hamilton->Alford
+Hamilton->Holiday
+Holiday->Hamilton
+Holiday->Ball
+Welsh->Ball
+Welsh->Alford
+
+
+Messages
+
+Aribtary Client to Server
+Client: 
+IAMAT [identifier] [coordinates(iso 6709)] [timestamp]
+Server Response:
+AT [serverName] [timeskew (this->time - sent time)] [copy of client sent data]
+- Save the client info and coordinates
+
+Client:
+WHATSAT [identifier] [radius (km) (max 50)] [upperBound of locations (max 20)]
+Response:
+JSON object from Google Places
+	> Preprocessed so there are no duplicate newlines and 2 newlines at the end
+
+Server to server
+Flood identifier info
+Server 1: 
+THEYAREAT [identifier] [coordinates] [timestamp]
+Server Response: 
+Nothing. Just store.
+
+If server does not respond in time, drop connection
+
+Upon dropped connection
+	- Remove server from adjacent
+
+Upon starting connection
+	- Do connection
+
+FOR ALL OF THE ABOVE EVENTS
+Log in format: [timestamp]: stuff
+
+
+During connection,
+If new server connection
+	- Save to server list
+		: List of objects; {name: name, serverIp: ip}
+If new client connection
+	- Save to client list
+When connection is dropped, remove it
+
+Either way, messages to pay attention to
+- IAMAT
+- WHATSAT
+- THEYAREAT

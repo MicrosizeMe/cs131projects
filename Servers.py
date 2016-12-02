@@ -140,14 +140,77 @@ class Places(LineReceiver):
 
 class PlacesFactory(Factory):
 
-    def __init__(self, serverName, ):
+    def __init__(self, serverName, siblings):
         self.clients = {} # maps user clients to Chat instances
-        self.siblings = [] # Lists adjacent server nodes
+        # Sibling entry format
+        # {
+        #   "name": "ServerName",
+        #   "serverIp": portNumber
+        # }
+        # 
+        # 
+        self.siblings = siblings # Lists adjacent server nodes
         self.serverName = serverName
         printMessage("Staring server " + serverName)
 
     def buildProtocol(self, addr):
         return Places(self)
 
-reactor.listenTCP(8000, PlacesFactory("Alford"))
+
+alfordSiblings = [
+    {
+        "name": "Hamilton",
+        "serverIp": conf.PORT_NUM["Hamilton"] 
+    },
+    {
+        "name": "Welsh",
+        "serverIp": conf.PORT_NUM["Welsh"] 
+    }
+]
+ballSiblings = [
+    {
+        "name": "Holiday",
+        "serverIp": conf.PORT_NUM["Holiday"] 
+    },
+    {
+        "name": "Welsh",
+        "serverIp": conf.PORT_NUM["Welsh"] 
+    }
+]
+hamiltonSiblings = [
+    {
+        "name": "Holiday",
+        "serverIp": conf.PORT_NUM["Holiday"] 
+    },
+    {
+        "name": "Alford",
+        "serverIp": conf.PORT_NUM["Alford"] 
+    }
+]
+holidaySiblings = [
+    {
+        "name": "Hamilton",
+        "serverIp": conf.PORT_NUM["Hamilton"] 
+    },
+    {
+        "name": "Ball",
+        "serverIp": conf.PORT_NUM["Ball"] 
+    }
+]
+welshSiblings = [
+    {
+        "name": "Ball",
+        "serverIp": conf.PORT_NUM["Ball"] 
+    },
+    {
+        "name": "Alford",
+        "serverIp": conf.PORT_NUM["Alford"] 
+    }
+]
+
+reactor.listenTCP(conf.PORT_NUM["Alford"], PlacesFactory("Alford", alfordSiblings))
+reactor.listenTCP(conf.PORT_NUM["Ball"], PlacesFactory("Ball", ballSiblings))
+reactor.listenTCP(conf.PORT_NUM["Hamilton"], PlacesFactory("Hamilton", hamiltonSiblings))
+reactor.listenTCP(conf.PORT_NUM["Holiday"], PlacesFactory("Holiday", holidaySiblings))
+reactor.listenTCP(conf.PORT_NUM["Welsh"], PlacesFactory("Welsh", welshSiblings))
 reactor.run()

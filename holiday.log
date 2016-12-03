@@ -1,0 +1,6 @@
+INFO:root:Holiday@1480684937.15: Staring server Holiday
+INFO:root:Holiday@1480684937.15: Found peer server Hamilton!
+INFO:root:Holiday@1480684939.97: Found peer server Ball!
+INFO:root:Holiday@1480685030.99: Received interserver data from Hamilton
+INFO:root:Holiday@1480685030.99: Sent interserver data to Ball
+INFO:root:Holiday@1480685064.55: Server Ball dropped!

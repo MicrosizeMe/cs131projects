@@ -9,6 +9,7 @@ from twisted.internet.defer import Deferred
 from twisted.internet.protocol import ClientFactory
 from twisted.protocols.basic import LineReceiver
 
+import conf
 
 
 class EchoClient(LineReceiver):
@@ -46,7 +47,7 @@ class EchoClientFactory(ClientFactory):
 
 def main(reactor):
     factory = EchoClientFactory()
-    reactor.connectTCP('localhost', 8000, factory)
+    reactor.connectTCP('localhost', conf.PORT_NUM["Hamilton"], factory)
     return factory.done
 
 

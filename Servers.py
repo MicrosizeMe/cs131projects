@@ -1,4 +1,4 @@
-from twisted.internet.protocol import Factory
+from twisted.internet.protocol import ClientFactory
 from twisted.protocols.basic import LineReceiver
 from twisted.internet import reactor
 
@@ -6,34 +6,106 @@ import time
 import conf
 import requests
 import json
+import copy
 
-def printMessage(message):
-    print("" + str(time.time()) + ": " + message)
+import logging 
 
-class Places(LineReceiver):
+LogName = conf.logName
+
+logging.basicConfig(filename=LogName, level=logging.DEBUG)
+
+def printMessage(header, message):
+    logging.info("" + header + "@" + str(time.time()) + ": " + message)
+
+
+# Primary json data format for line:
+# {'timestamp': time, 'client': 'String', 'location': 'string', 'source': ['serverName']}
+# self.factory.siblingConfigs entry format
+# {
+#   "name": "ServerName",
+#   "serverPort": portNumber,
+#   "serverHost": hostname,
+#   "protocol": protocol
+# }
+class PlacesServerServer(LineReceiver):
+
+    def __init__(self, factory, partnerName):
+        self.factory = factory
+        self.partnerName = partnerName 
+
+    def connectionMade(self):
+        for serverConfig in self.factory.siblingConfigs:
+            if serverConfig["name"] == self.partnerName:
+                serverConfig["protocol"] = self
+                break
+        printMessage(self.factory.serverName, "Found peer server " + self.partnerName + "!")
+
+        # Once we've connected, we should establish the thing exists.
+
+    def connectionLost(self, reason):
+        for serverConfig in self.factory.siblingConfigs:
+            if serverConfig["name"] == self.partnerName:
+                serverConfig["protocol"] = None
+                break
+        printMessage(self.factory.serverName, "Server " + self.partnerName + " dropped!")
+
+    # Servers send pure json data to and from each other for easy encoding and storage.
+    def lineReceived(self, line):
+        jsonLine = json.loads(line)
+        source = jsonLine['source']
+        printMessage(self.factory.serverName, "Received interserver data from " + ','.join(source))
+        # propagate to neighbors
+        self.propagateMessage(jsonLine)
+        # Save the message
+        self.saveMessage(jsonLine)
+
+    # Code useful in propagating messages. If the jsonField has a source key, 
+    # don't propagate it to any server in the source list (or you echo). Otherwise, propagate 
+    # to adjacent servers not on the list
+    # Note that this object we pass is NOT cloned, so use of this function from
+    # the outside should clone the object to avoid having data appended.
+    def propagateMessage(self, jsonLine):
+        newSource = []
+        if jsonLine.has_key("source"): 
+            newSource = jsonLine["source"]
+        newSource.append(self.factory.serverName)
+        jsonLine["source"] = newSource
+        for serverConfig in self.factory.siblingConfigs:
+            if serverConfig["name"] not in newSource and serverConfig.has_key("protocol") and serverConfig["protocol"] != None:
+                serverConfig["protocol"].sendLine(json.dumps(jsonLine))
+                printMessage(self.factory.serverName, "Sent interserver data to " + serverConfig["name"])
+
+    # Saves a received json line. Should only really be used for interserver communication
+    def saveMessage(self, jsonLine):
+        if jsonLine.has_key("source"):
+            del jsonLine["source"]
+        self.factory.clients[jsonLine["client"]] = jsonLine
+
+
+class PlacesClientServer(LineReceiver):
 
     def __init__(self, factory):
         self.factory = factory
 
     def connectionMade(self):
-        printMessage("Made connection...")
+        printMessage(self.factory.serverName, "Made connection with client.")
 
     def connectionLost(self, reason):
-        printMessage("Lost connection...")
+        printMessage(self.factory.serverName, "Lost connection with client.")
 
     def lineReceived(self, line):
-        printMessage("Line recieved: " + line)
+        printMessage(self.factory.serverName, "Line received: " + line)
         args = line.strip().split()
         # Subsequent action depends on the first argument.
-        print args
         if args[0] == "IAMAT":
-            print "Iamat!"
             returnArg = self.saveLocationData(args)
             if returnArg.has_key("error"):
-
                 self.sendLine(returnArg["error"])
             else:
+                # Send client a response.
                 self.sendATResponse(args, returnArg)
+                # Propagate data to sibling servers.
+                self.beginPropagation(returnArg)
         elif args[0] == "WHATSAT":
             # Approach taken: If we don't find it on this node, pretend
             # that it's not here. It might be on another node and 
@@ -43,7 +115,7 @@ class Places(LineReceiver):
             if returnArg.has_key("error"):
                 self.sendLine(returnArg["error"])
             else:
-                printMessage("Sending data: " + returnArg["data"])
+                printMessage(self.factory.serverName, "Sending data: " + returnArg["data"])
                 self.sendLine(returnArg["data"])
 
     # def handle_CHAT(self, message):
@@ -69,8 +141,6 @@ class Places(LineReceiver):
         returnArg["location"] = locationString
         returnArg["timestamp"] = timestamp
         self.factory.clients[client] = returnArg
-        # print returnArg
-        print self.factory.clients
         return returnArg
 
     def getWHATSATData(self, args):
@@ -118,8 +188,6 @@ class Places(LineReceiver):
         returnArg["data"] = text
         return returnArg
  
-
-
     def sendATResponse(self, args, returnArg):
         if returnArg != None and not returnArg.has_key("error"):
             timestamp = None
@@ -131,86 +199,101 @@ class Places(LineReceiver):
                     " " + str(time.time() - returnArg["timestamp"]) + 
                     " " + " ".join(args[1:])
             )
-            printMessage("Sending line: " + message)
+            printMessage(self.factory.serverName, "Sending line: " + message)
             self.sendLine(message)
 
-    # def propogateData(self, )
+    def beginPropagation(self, returnArg): 
+        # Sends the returnArg object (really a copy of it)
+        sendArgument = copy.deepcopy(returnArg)
+        self.factory.beginPropagation(returnArg)
+        
 
 
 
-class PlacesFactory(Factory):
+class PlacesFactory(ClientFactory):
 
-    def __init__(self, serverName, siblings):
-        self.clients = {} # maps user clients to Chat instances
-        # Sibling entry format
-        # {
-        #   "name": "ServerName",
-        #   "serverIp": portNumber
-        # }
-        # 
-        # 
-        self.siblings = siblings # Lists adjacent server nodes
+    # siblingConfigs entry format
+    # {
+    #   "name": "ServerName",
+    #   "serverPort": portNumber,
+    #   "serverHost": hostname,
+    #   "protocol": protocol
+    # }
+    # 
+    # serverName is just the name of the server, eg Alford
+    def __init__(self, serverName, siblingConfigs, myConfig):
+        # maps user clients to location data.
+        self.clients = {} 
+        # siblingConfigs will have its items appended with a field storing
+        # the connection data, to be stored in protocol.
+        self.siblingConfigs = siblingConfigs # Lists adjacent server nodes. 
         self.serverName = serverName
-        printMessage("Staring server " + serverName)
+        self.config = myConfig
+        printMessage(self.serverName, "Staring server " + serverName)
 
     def buildProtocol(self, addr):
-        return Places(self)
+        # We only care about the attributes of addr.
+        addr = vars(addr)
+        for sibling in self.siblingConfigs:
+            # In this case, if the connecting client has the 
+            # same port and hostname as one of our siblings, 
+            # then it's actually a server that started after we did.
+            # Make a different protocol for it.
+            if sibling["serverPort"] == addr["port"] \
+                    and sibling["serverHost"] == addr["host"]: 
+                return PlacesServerServer(self, sibling["name"])
 
+        return PlacesClientServer(self)
 
-alfordSiblings = [
-    {
-        "name": "Hamilton",
-        "serverIp": conf.PORT_NUM["Hamilton"] 
-    },
-    {
-        "name": "Welsh",
-        "serverIp": conf.PORT_NUM["Welsh"] 
-    }
-]
-ballSiblings = [
-    {
-        "name": "Holiday",
-        "serverIp": conf.PORT_NUM["Holiday"] 
-    },
-    {
-        "name": "Welsh",
-        "serverIp": conf.PORT_NUM["Welsh"] 
-    }
-]
-hamiltonSiblings = [
-    {
-        "name": "Holiday",
-        "serverIp": conf.PORT_NUM["Holiday"] 
-    },
-    {
-        "name": "Alford",
-        "serverIp": conf.PORT_NUM["Alford"] 
-    }
-]
-holidaySiblings = [
-    {
-        "name": "Hamilton",
-        "serverIp": conf.PORT_NUM["Hamilton"] 
-    },
-    {
-        "name": "Ball",
-        "serverIp": conf.PORT_NUM["Ball"] 
-    }
-]
-welshSiblings = [
-    {
-        "name": "Ball",
-        "serverIp": conf.PORT_NUM["Ball"] 
-    },
-    {
-        "name": "Alford",
-        "serverIp": conf.PORT_NUM["Alford"] 
-    }
-]
+    def clientConnectionFailed(self, connector, reason):
+        if reason.getErrorMessage() == "Couldn't bind: 10048: Only one usage of each socket address (protocol/network address/port) is normally permitted.":
+            print("Connection failed: Odds are good that there's some TCP timeout on this port or the sever isn't up yet. You may have to restart this node later.")
+            print("Port in question: " + 
+                str(connector.getDestination().host) + 
+                ":" + 
+                str(connector.getDestination().port)
+            )
 
-reactor.listenTCP(conf.PORT_NUM["Alford"], PlacesFactory("Alford", alfordSiblings))
-reactor.listenTCP(conf.PORT_NUM["Ball"], PlacesFactory("Ball", ballSiblings))
-reactor.listenTCP(conf.PORT_NUM["Hamilton"], PlacesFactory("Hamilton", hamiltonSiblings))
-reactor.listenTCP(conf.PORT_NUM["Holiday"], PlacesFactory("Holiday", holidaySiblings))
-reactor.listenTCP(conf.PORT_NUM["Welsh"], PlacesFactory("Welsh", welshSiblings))
-reactor.run()
+    # This code is called when we initially create the factory after the reacter
+    # is ready. 
+    # As a consequence, since siblings is set and since
+    # buildProtocol is created, we can attempt to connect to our
+    # sibling nodes now. Do that. 
+    def connectSiblings(self, passedReactor):
+        for sibling in self.siblingConfigs: 
+            # 5 second timeout for connections.
+            print("Attempting to connect to " + sibling["name"])
+            passedReactor.connectTCP(
+                sibling["serverHost"], 
+                sibling["serverPort"], 
+                self, 
+                5,
+                (self.config["serverHost"], self.config["serverPort"])
+            ).getDestination()
+
+    # Sends the object to all adjacent servers. Does this by calling
+    # one of the propagateMessage functions of one of the server connections.
+    def beginPropagation(self, object):
+        for sibling in self.siblingConfigs:
+            if sibling.has_key("protocol") and sibling["protocol"] != None:
+                sibling["protocol"].propagateMessage(object)
+                break
+
+# Alford = PlacesFactory("Alford", copy.deepcopy(conf.alfordSiblings), copy.deepcopy(conf.AlfordConfig))
+# Ball = PlacesFactory("Ball", copy.deepcopy(conf.ballSiblings), copy.deepcopy(conf.BallConfig))
+# Hamilton = PlacesFactory("Hamilton", copy.deepcopy(conf.hamiltonSiblings), copy.deepcopy(conf.HamiltonConfig))
+# Holiday = PlacesFactory("Holiday", copy.deepcopy(conf.holidaySiblings), copy.deepcopy(conf.HolidayConfig))
+# Welsh = PlacesFactory("Welsh", copy.deepcopy(conf.welshSiblings), copy.deepcopy(conf.WelshConfig))
+
+# # Alford.connectSiblings(reactor)
+# reactor.listenTCP(conf.PORT_NUM["Alford"], Alford)
+# Ball.connectSiblings(reactor)
+# reactor.listenTCP(conf.PORT_NUM["Ball"], Ball)
+# Hamilton.connectSiblings(reactor)
+# reactor.listenTCP(conf.PORT_NUM["Hamilton"], Hamilton)
+# Holiday.connectSiblings(reactor)
+# reactor.listenTCP(conf.PORT_NUM["Holiday"], Holiday)
+# Welsh.connectSiblings(reactor)
+# reactor.listenTCP(conf.PORT_NUM["Welsh"], Welsh)
+
+# reactor.run()

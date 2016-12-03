@@ -1,0 +1,198 @@
+INFO:root:Hamilton@1480684752.16: Staring server Hamilton
+INFO:root:Hamilton@1480684770.29: Made connection with client.
+INFO:root:Hamilton@1480684777.35: Line received: IAMAT kiwi.cs.ucla.edu +34.068930-118.445127 1479413884.392014450
+INFO:root:Hamilton@1480684777.35: Sending line: AT Hamilton 1270892.95599 kiwi.cs.ucla.edu +34.068930-118.445127 1479413884.392014450
+INFO:root:Hamilton@1480684787.65: Line received: WHATSAT kiwi.cs.ucla.edu 10 5
+DEBUG:requests.packages.urllib3.connectionpool:Starting new HTTPS connection (1): maps.googleapis.com
+DEBUG:requests.packages.urllib3.connectionpool:https://maps.googleapis.com:443 "GET /maps/api/place/nearbysearch/json?location=+34.068930,-118.445127&radius=10&key=AIzaSyDWMr_PUlrgQ2ssarP7TK5CRtu3VlpMdMQ HTTP/1.1" 200 2479
+INFO:root:Hamilton@1480684788.3: Sending data: {
+    "status": "OK", 
+    "html_attributions": [], 
+    "results": [
+        {
+            "name": "Los Angeles", 
+            "reference": "CmRbAAAAyQdt3x5uxi6M6FjNgdTCoVK64lb8C5On6F-1UTgiHEwd1HRlT1IZOymWtCLQTM5iSngR4UE5wy5Zbui72MkVAOn-bHkrnI01lDNRZx52VzMM06CmrcoL9ezsCqIF8pvYEhDRnwIOlgOM24faEwfby61lGhT3EBcYfIKGfQktoONf7MlKS4uLfg", 
+            "geometry": {
+                "location": {
+                    "lat": 34.0522342, 
+                    "lng": -118.2436849
+                }, 
+                "viewport": {
+                    "northeast": {
+                        "lat": 34.3373061, 
+                        "lng": -118.1552891
+                    }, 
+                    "southwest": {
+                        "lat": 33.7036917, 
+                        "lng": -118.6681759
+                    }
+                }
+            }, 
+            "place_id": "ChIJE9on3F3HwoAR9AhGJW_fL-I", 
+            "vicinity": "Los Angeles", 
+            "photos": [
+                {
+                    "photo_reference": "CoQBdwAAABcbsj-tU7f8B_bR4Wh2KDi_kGzLspRFJcMKnPYH1GxVifs-1YJHx4GApPrXeODBgQJacdV7I_lzqfeOoWaF9Lv02WJvI-zlModd6eaJIF1zp_xBExLgmQ5pIHNMsdymZREM2NV6pyQ1_EG3QQAp_KKuPKVaFgjzuYRFWEvowY1KEhDJ7Ih36sGcM7EdsnoGMDmZGhQQ6ATeBBbYq1x2SLVSsbBy43XHWA", 
+                    "width": 3264, 
+                    "html_attributions": [
+                        "<a href=\"https://maps.google.com/maps/contrib/110754648019535581166/photos\">irvin leon</a>"
+                    ], 
+                    "height": 1836
+                }
+            ], 
+            "scope": "GOOGLE", 
+            "id": "7f7b7d8118ae8db8ed3f541159ac928c484d12ad", 
+            "types": [
+                "locality", 
+                "political"
+            ], 
+            "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/geocode-71.png"
+        }, 
+        {
+            "rating": 4.5, 
+            "name": "University of California, Los Angeles", 
+            "reference": "CmRRAAAA6deIBRobHplHmeMoKAhaky8uPXqs8RNqGNpQ-qeko4Dwcu0rXXwxuaPbU8SojatHGZJFXdTyTfO6S2Vs8yE9izzDZcSXAKli4b-X0QZzwkX0xN-xxT5e01n_SHYneUbmEhAPyg9euFivwyD_kVEm3YbEGhTFeb9H9BWk07harMtH8e0tkSteCQ", 
+            "geometry": {
+                "location": {
+                    "lat": 34.068921, 
+                    "lng": -118.4451811
+                }, 
+                "viewport": {
+                    "northeast": {
+                        "lat": 34.08632165, 
+                        "lng": -118.4298687
+                    }, 
+                    "southwest": {
+                        "lat": 34.05637465, 
+                        "lng": -118.4632287
+                    }
+                }
+            }, 
+            "place_id": "ChIJZQ9c8IW8woARN0gTXFiTqSU", 
+            "vicinity": "Los Angeles", 
+            "photos": [
+                {
+                    "photo_reference": "CoQBdwAAAI44DZgpUZ4NCzRkz9gXYlf6uJJx_dpXqCpZqPP3mZa7Q9nAZAuJt28U88zsVaXfC1NKGNFdsAS6mSl-5mvgzUircCvze74sxZEJ9FniRcX-Djrx7EQ-423hM4FOX2zHL2yH_ABDAurbjJ37CS-OZKJDKx3AY1sB9m2WpMT-PlF_EhBMBoTFlGD2U5OT-XnTX3KzGhQGzmuOLbck2i6_AzZ_q-ji3AufaA", 
+                    "width": 3072, 
+                    "html_attributions": [
+                        "<a href=\"https://maps.google.com/maps/contrib/116579609121253458406/photos\">George Germanos</a>"
+                    ], 
+                    "height": 2304
+                }
+            ], 
+            "scope": "GOOGLE", 
+            "id": "4d56f16ad3d8976d49143fa4fdfffbc0a7ce8e39", 
+            "types": [
+                "university", 
+                "point_of_interest", 
+                "establishment"
+            ], 
+            "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/school-71.png"
+        }, 
+        {
+            "name": "University of California, Los Angeles", 
+            "reference": "CmRRAAAAc4ETv7cHwLO8gVvMS-GTfmxOfxPulefS2c4UBOdEv1u4VU2EEq0kocBMHP8kwgdQPTzJsMI-1h8gKZKHDUi1c4paFxvOT2HY8pI-pLmfBq_FD53ouHUz5N9nhmoCGBNwEhBKQKWNiZ6IgzzeVYvU7lE-GhTaaZWoXcvuYPOzk1jvxWVaOodunA", 
+            "geometry": {
+                "location": {
+                    "lat": 34.068921, 
+                    "lng": -118.4451811
+                }, 
+                "viewport": {
+                    "northeast": {
+                        "lat": 34.06902119999999, 
+                        "lng": -118.4449249
+                    }, 
+                    "southwest": {
+                        "lat": 34.0688876, 
+                        "lng": -118.4452665
+                    }
+                }
+            }, 
+            "place_id": "ChIJi2-gEH67woARErSL-8SY8zY", 
+            "vicinity": "Los Angeles", 
+            "scope": "GOOGLE", 
+            "id": "34aa535beb4a1b85c1deccb5d4324d2ae52d256e", 
+            "types": [
+                "university", 
+                "point_of_interest", 
+                "establishment"
+            ], 
+            "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/school-71.png"
+        }, 
+        {
+            "name": "Amazon Locker - Covel", 
+            "reference": "CmRSAAAASGjcurJFEbFq2kqIN29va6cyjdK_j8pYTeNbYXSOAX700FYKEgQmmQ6Gn66uONN-v3z-g-_tjXrnW9F1Z1XP6J70KnRZ5W7eWh6BQgZNL-hhth9wXx41L73KIhFtLJq1EhCojNn86uCojNI5Gck1SLlOGhT8mJB09ayBcwYRJJI4Zstae7M1fg", 
+            "geometry": {
+                "location": {
+                    "lat": 34.068921, 
+                    "lng": -118.4451811
+                }
+            }, 
+            "opening_hours": {
+                "weekday_text": [], 
+                "open_now": true
+            }, 
+            "place_id": "ChIJ5Yvbq4i8woAR_hzXVkDyk74", 
+            "vicinity": "200 De Neve Dr, at UCLA Covel Commons, Los Angeles", 
+            "scope": "GOOGLE", 
+            "id": "a392fa0dad510c05b5d5a82616b17a59ca91ff45", 
+            "types": [
+                "point_of_interest", 
+                "establishment"
+            ], 
+            "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/generic_business-71.png"
+        }, 
+        {
+            "name": "Westwood", 
+            "reference": "CmRbAAAATn3o4Oo_hrEVXj5w2wcexuNiwXAjdeFhCBzw-R1y4CdkpD5Ua_o6AG_YzKnT8mgH84yMKWv4nRUQiQyUpBsWmRF18gESmrF-XYFo-zq4fy8X10eDnp0h6_efewKDmny-EhAFvHOLOYMZSGaiP5d9SvuwGhSWewPvKcwWz-ZKVnfR6CbXEYGHKw", 
+            "geometry": {
+                "location": {
+                    "lat": 34.0635016, 
+                    "lng": -118.4455164
+                }, 
+                "viewport": {
+                    "northeast": {
+                        "lat": 34.0827807, 
+                        "lng": -118.4141518
+                    }, 
+                    "southwest": {
+                        "lat": 34.0470589, 
+                        "lng": -118.4665319
+                    }
+                }
+            }, 
+            "place_id": "ChIJecf92oa8woARVlNT9X_x42M", 
+            "vicinity": "Los Angeles", 
+            "photos": [
+                {
+                    "photo_reference": "CoQBdwAAALtrjpOwHzyViP56Mx0F_dvGnhUDLVXux4vhL79FnwJ07tTzURQWEAuxhlhC1ntQVbZ51QU7dtRjsRqXyDGpPG2oW9T-3JrPbwitngm4xDjDDWuxp6XjFsueJtnInX0-djvXtBFC8NRZaGzGhb9te0-5MAunMaGm1iGnIlRVsO3pEhBXH9nkWUrpxaar-z-hSzCQGhQrkTgleAoPEL5dgj0fu9TFewsFzA", 
+                    "width": 4032, 
+                    "html_attributions": [
+                        "<a href=\"https://maps.google.com/maps/contrib/112416170407648723941/photos\">Yingju Ma</a>"
+                    ], 
+                    "height": 3024
+                }
+            ], 
+            "scope": "GOOGLE", 
+            "id": "87ef87c6cb98059f72b40a917e6e9c8c80e5d8b3", 
+            "types": [
+                "neighborhood", 
+                "political"
+            ], 
+            "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/geocode-71.png"
+        }
+    ]
+}
+
+
+INFO:root:Hamilton@1480684870.38: Lost connection with client.
+INFO:root:Hamilton@1480684923.58: Staring server Hamilton
+INFO:root:Hamilton@1480684923.58: Found peer server Alford!
+INFO:root:Hamilton@1480684937.15: Found peer server Holiday!
+INFO:root:Hamilton@1480685011.17: Made connection with client.
+INFO:root:Hamilton@1480685030.99: Line received: IAMAT kiwi.cs.ucla.edu +34.068930-118.445127 1479413884.392014450
+INFO:root:Hamilton@1480685030.99: Sending line: AT Hamilton 1271146.60199 kiwi.cs.ucla.edu +34.068930-118.445127 1479413884.392014450
+INFO:root:Hamilton@1480685030.99: Sent interserver data to Alford
+INFO:root:Hamilton@1480685030.99: Sent interserver data to Holiday
+INFO:root:Hamilton@1480685064.52: Lost connection with client.
+INFO:root:Hamilton@1480685064.56: Server Holiday dropped!

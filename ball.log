@@ -1,0 +1,6 @@
+INFO:root:Ball@1480684939.97: Staring server Ball
+INFO:root:Ball@1480684939.97: Found peer server Holiday!
+INFO:root:Ball@1480684942.37: Found peer server Welsh!
+INFO:root:Ball@1480685030.99: Received interserver data from Hamilton,Holiday
+INFO:root:Ball@1480685031.0: Sent interserver data to Welsh
+INFO:root:Ball@1480685064.53: Server Welsh dropped!

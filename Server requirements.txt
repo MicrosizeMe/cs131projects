@@ -33,17 +33,17 @@ JSON object from Google Places
 Server to server
 Flood identifier info
 Server 1: 
-THEYAREAT [identifier] [coordinates] [timestamp]
+----THEYAREAT [ServerName] [identifier] [coordinates] [timestamp]
+Whole json 
 Server Response: 
 Nothing. Just store.
-
-If server does not respond in time, drop connection
 
 Upon dropped connection
 	- Remove server from adjacent
 
 Upon starting connection
 	- Do connection
+	- Add server to server list
 
 FOR ALL OF THE ABOVE EVENTS
 Log in format: [timestamp]: stuff
